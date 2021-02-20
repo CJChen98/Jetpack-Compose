@@ -71,7 +71,9 @@ dependencies {
 
     //Paging3
     def paging_version = "3.0.0-beta01"
-    implementation "androidx.paging:paging-runtime:$paging_version"
+    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
     // Jetpack Compose Integration
     implementation "androidx.paging:paging-compose:1.0.0-alpha07"
+    //Glide
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
 }

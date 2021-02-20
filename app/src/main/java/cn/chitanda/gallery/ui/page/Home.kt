@@ -1,26 +1,29 @@
 package cn.chitanda.gallery.ui.page
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cn.chitanda.gallery.R
 import cn.chitanda.gallery.data.ImageHit
-import cn.chitanda.gallery.ui.theme.GalleryTheme
+import cn.chitanda.gallery.ui.view.NetworkImage
 import cn.chitanda.gallery.viewmodel.GalleryViewModel
 
 /**
@@ -33,7 +36,15 @@ fun HomePage() {
     Scaffold(
         topBar = {
             TopAppBar(Modifier.background(MaterialTheme.colors.primary)) {
-                Text(text = "Home")
+                Box(Modifier.padding(start = 16.dp,top = 8.dp)) {
+                    Text(
+                        text = "Pixaby",
+                        style = TextStyle(
+                            color = MaterialTheme.colors.surface,
+                            fontSize = 28.sp
+                        )
+                    )
+                }
             }
         }
     ) {
@@ -56,27 +67,38 @@ private fun ImageList(viewModel: GalleryViewModel) {
 
 @Composable
 private fun ImageListItem(item: ImageHit) {
-    Card(elevation = 2.dp, modifier = Modifier.padding(10.dp)) {
+    Card(elevation = 2.dp, modifier = Modifier.padding(16.dp)) {
         Column(Modifier.clickable { }.fillMaxWidth()) {
             Row(Modifier.padding(8.dp)) {
-                Image(
-                    painter = painterResource(id = R.drawable.avatar_1),
+                NetworkImage(
+                    url = item.userImageURL,
                     contentDescription = "avatar",
-                    modifier = Modifier.padding(10.dp).size(48.dp).clip(CircleShape).clickable { }
+                    modifier = Modifier.padding(8.dp).size(48.dp).clip(CircleShape).clickable { }
                 )
-                Column(modifier = Modifier.padding(8.dp)) {
+                Column(modifier = Modifier.padding(6.dp)) {
                     Text(text = item.user)
                     Row {
-                        Icon(
+                        Image(
                             painter = painterResource(id = R.drawable.ic_favorite),
                             contentDescription = "likes",
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.padding(end = 8.dp).size(20.dp)
                         )
                         Text(text = item.likes.toString())
                     }
                 }
             }
-            //todo     Image(painter = , contentDescription = "image")
+            Box(
+                modifier = Modifier.padding(start = 8.dp, top = 2.dp, end = 8.dp, bottom = 12.dp)
+                    .fillMaxWidth()
+            ) {
+                NetworkImage(
+                    url = item.webformatURL,
+                    contentDescription = "image",
+                    modifier = Modifier.fillMaxSize().clip(
+                        RoundedCornerShape(3.dp)
+                    )
+                )
+            }
         }
     }
 }
@@ -85,6 +107,29 @@ private fun ImageListItem(item: ImageHit) {
 @Composable
 fun ImageListItemPreview() {
     val item =
-        ImageHit(0, 0, 0, 0, 0, 0, 0, "", 0, "", 0, "", 0, "", "", "chen", 0, "", 0, 0, "", 0)
+        ImageHit(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            "",
+            0,
+            "",
+            0,
+            "",
+            0,
+            "",
+            "",
+            "chen",
+            0,
+            "",
+            0,
+            0,
+            "https://pixabay.com/get/35bbf209e13e39d2_640.jpg",
+            0
+        )
     ImageListItem(item)
 }
