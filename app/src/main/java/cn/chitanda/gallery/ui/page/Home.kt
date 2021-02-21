@@ -12,12 +12,9 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -36,7 +33,7 @@ fun HomePage() {
     Scaffold(
         topBar = {
             TopAppBar(Modifier.background(MaterialTheme.colors.primary)) {
-                Box(Modifier.padding(start = 16.dp,top = 8.dp)) {
+                Box(Modifier.padding(start = 16.dp, top = 8.dp)) {
                     Text(
                         text = "Pixaby",
                         style = TextStyle(
@@ -63,6 +60,7 @@ private fun ImageList(viewModel: GalleryViewModel) {
             ImageListItem(item)
         }
     }
+
 }
 
 @Composable
@@ -87,18 +85,14 @@ private fun ImageListItem(item: ImageHit) {
                     }
                 }
             }
-            Box(
+            NetworkImage(
+                url = item.webformatURL,
+                contentDescription = "image",
                 modifier = Modifier.padding(start = 8.dp, top = 2.dp, end = 8.dp, bottom = 12.dp)
-                    .fillMaxWidth()
-            ) {
-                NetworkImage(
-                    url = item.webformatURL,
-                    contentDescription = "image",
-                    modifier = Modifier.fillMaxSize().clip(
+                    .fillMaxSize().clip(
                         RoundedCornerShape(3.dp)
-                    )
-                )
-            }
+                    ), width = item.webformatWidth, height = item.webformatHeight
+            )
         }
     }
 }
