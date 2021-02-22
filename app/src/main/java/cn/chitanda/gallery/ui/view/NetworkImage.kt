@@ -5,13 +5,14 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import cn.chitanda.gallery.R
 import kotlinx.coroutines.async
 import okhttp3.*
 import java.io.IOException
@@ -46,18 +47,17 @@ fun NetworkImage(
             contentScale = contentScale
         )
     } else {
-//        val context = LocalContext.current
-        Image(
-            painter = painterResource(id = R.drawable.ic_loading_image),
-            contentDescription = contentDescription,
+        Column(
             modifier = modifier,
-            contentScale = contentScale
-        )
-
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator()
+        }
         LaunchedEffect(url) {
             bitmap =
                 async {
-                    NetworkManager.downloadBitmap(
+                    RequestManager.downloadBitmap(
                         url,
                         width,
                         height
@@ -67,39 +67,33 @@ fun NetworkImage(
     }
 }
 
-object NetworkManager {
+object RequestManager {
     private val okHttpClient by lazy { OkHttpClient() }
 
     suspend fun downloadBitmap(url: String, width: Int, height: Int): Bitmap? {
         val request = Request.Builder().url(url).build()
         val call = okHttpClient.newCall(request = request)
-        return suspendCoroutine { continuation ->
-            call.enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    continuation.resume(null)
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    val body = response.body
-                    if (body != null) {
-                        val bitmap = try {
-                            val bytes = body.byteStream().readBytes()
-                            val options =
-                                BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                            BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
-                            options.inSampleSize = calculateInSampleSize(options, width, height)
-                            options.inJustDecodeBounds = false
-                            BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options).also {
-                                Log.d(TAG, "downloadBitmap: $it")
-                            }
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                            null
-                        }
-                        continuation.resume(bitmap)
+        return call.await { _, response ->
+            val body = response.body
+            var bitmap: Bitmap? = null
+            if (body != null) {
+                bitmap = try {
+                    val bytes = body.byteStream().readBytes()
+                    val options =
+                        BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
+                    options.inSampleSize =
+                        calculateInSampleSize(options, width, height)
+                    options.inJustDecodeBounds = false
+                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options).also {
+                        Log.d(TAG, "downloadBitmap: $it")
                     }
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    null
                 }
-            })
+            }
+            bitmap
         }
     }
 
@@ -120,3 +114,18 @@ object NetworkManager {
         }
     }
 }
+
+suspend inline fun <T> Call.await(crossinline onResponse: (call: Call, response: Response) -> T?): T? {
+    return suspendCoroutine { continuation ->
+        enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                continuation.resume(null)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                continuation.resume(onResponse(call, response))
+            }
+        })
+    }
+}
+
