@@ -47,11 +47,7 @@ fun NetworkImage(
             contentScale = contentScale
         )
     } else {
-        Column(
-            modifier = modifier,
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Center {
             CircularProgressIndicator()
         }
         LaunchedEffect(url) {
@@ -71,6 +67,10 @@ object RequestManager {
     private val okHttpClient by lazy { OkHttpClient() }
 
     suspend fun downloadBitmap(url: String, width: Int, height: Int): Bitmap? {
+        if (!(url.startsWith("https://")||url.startsWith("http://"))){
+            Log.e(TAG, "downloadBitmap error: $url")
+            return null
+        }
         val request = Request.Builder().url(url).build()
         val call = okHttpClient.newCall(request = request)
         return call.await { _, response ->
