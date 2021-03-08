@@ -12,11 +12,11 @@ import androidx.compose.ui.unit.dp
  * @Description:
  */
 @Composable
-fun Center(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier =modifier,
-        content = content
-    )
+fun Center(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        content()
+    }
 }

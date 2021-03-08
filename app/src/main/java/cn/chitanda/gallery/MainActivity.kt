@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import cn.chitanda.gallery.ui.page.HomePage
 
 import cn.chitanda.gallery.ui.theme.GalleryTheme
+import cn.chitanda.gallery.ui.view.rika.glide.ProvideGlideLoader
 
 
 class MainActivity : AppCompatActivity() {
@@ -18,7 +19,7 @@ class MainActivity : AppCompatActivity() {
             GalleryTheme {
                 val navigation = rememberNavController()
                 NavHost(navController = navigation, startDestination = "home") {
-                    composable("home") { HomePage() }
+                    composable("home") { ProvideGlideLoader { HomePage() } }
                 }
 
             }

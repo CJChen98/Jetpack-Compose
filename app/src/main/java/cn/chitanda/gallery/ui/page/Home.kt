@@ -27,6 +27,7 @@ import cn.chitanda.gallery.data.VideoHit
 import cn.chitanda.gallery.databinding.VideoItemBinding
 import cn.chitanda.gallery.ui.view.Center
 import cn.chitanda.gallery.ui.view.NetworkImage
+import cn.chitanda.gallery.ui.view.rika.core.Rika
 import cn.chitanda.gallery.viewmodel.GalleryViewModel
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -63,12 +64,16 @@ fun HomePage() {
                 Text(
                     text = "Picture", textAlign = TextAlign.Center,
                     fontStyle = MaterialTheme.typography.caption.fontStyle,
-                    modifier = Modifier.clickable { currentPage = 0 }.padding(16.dp)
+                    modifier = Modifier
+                        .clickable { currentPage = 0 }
+                        .padding(16.dp)
                 )
                 Text(
                     text = "Video", textAlign = TextAlign.Center,
                     fontStyle = MaterialTheme.typography.caption.fontStyle,
-                    modifier = Modifier.clickable { currentPage = 1 }.padding(16.dp)
+                    modifier = Modifier
+                        .clickable { currentPage = 1 }
+                        .padding(16.dp)
                 )
             }
 
@@ -86,14 +91,21 @@ fun HomePage() {
 
 @Composable
 private fun ImageList(viewModel: GalleryViewModel) {
-    Box(Modifier.background(MaterialTheme.colors.background).fillMaxSize()) {
+    Box(
+        Modifier
+            .background(MaterialTheme.colors.background)
+            .fillMaxSize()
+    ) {
         if (viewModel.images.isEmpty()) {
             Center(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator()
             }
         } else {
             LazyColumn(
-                Modifier.background(MaterialTheme.colors.background).fillMaxWidth().fillMaxSize()
+                Modifier
+                    .background(MaterialTheme.colors.background)
+                    .fillMaxWidth()
+                    .fillMaxSize()
             ) {
                 itemsIndexed(viewModel.images) { _, item ->
                     ImageListItem(item)
@@ -108,13 +120,20 @@ private fun ImageList(viewModel: GalleryViewModel) {
 
 @Composable
 private fun ImageListItem(item: ImageHit) {
-    Card(elevation = 2.dp, modifier = Modifier.padding(16.dp)) {
-        Column(Modifier.clickable { }.fillMaxWidth()) {
+    Card(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
+        Column(
+            Modifier
+                .clickable { }
+                .fillMaxWidth()) {
             Row(Modifier.padding(8.dp)) {
-                NetworkImage(
+                Rika(
                     url = item.userImageURL,
                     contentDescription = "avatar",
-                    modifier = Modifier.padding(8.dp).size(48.dp).clip(CircleShape).clickable { }
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .clickable { }
                 )
                 Column(modifier = Modifier.padding(6.dp)) {
                     Text(text = item.user)
@@ -122,19 +141,23 @@ private fun ImageListItem(item: ImageHit) {
                         Image(
                             painter = painterResource(id = R.drawable.ic_favorite),
                             contentDescription = "likes",
-                            modifier = Modifier.padding(end = 8.dp).size(20.dp)
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(20.dp)
                         )
                         Text(text = item.likes.toString())
                     }
                 }
             }
-            NetworkImage(
+            Rika(
                 url = item.webformatURL,
                 contentDescription = "image",
-                modifier = Modifier.padding(start = 8.dp, top = 2.dp, end = 8.dp, bottom = 12.dp)
-                    .fillMaxSize().clip(
+                modifier = Modifier
+                    .padding(start = 8.dp, top = 2.dp, end = 8.dp, bottom = 12.dp)
+                    .fillMaxSize()
+                    .clip(
                         RoundedCornerShape(3.dp)
-                    ), width = item.webformatWidth, height = item.webformatHeight
+                    )
             )
         }
     }
@@ -142,14 +165,21 @@ private fun ImageListItem(item: ImageHit) {
 
 @Composable
 fun VideoList(viewModel: GalleryViewModel) {
-    Box(Modifier.background(MaterialTheme.colors.background).fillMaxSize()) {
+    Box(
+        Modifier
+            .background(MaterialTheme.colors.background)
+            .fillMaxSize()
+    ) {
         if (viewModel.videos.isEmpty()) {
             Center(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator()
             }
         } else {
             LazyColumn(
-                Modifier.background(MaterialTheme.colors.background).fillMaxWidth().fillMaxSize()
+                Modifier
+                    .background(MaterialTheme.colors.background)
+                    .fillMaxWidth()
+                    .fillMaxSize()
             ) {
                 itemsIndexed(viewModel.videos) { _, item ->
                     VideoListItem(item)
@@ -165,13 +195,20 @@ fun VideoList(viewModel: GalleryViewModel) {
 @Composable
 fun VideoListItem(item: VideoHit) {
     val uri = item.videos.medium.url
-    Card(elevation = 2.dp, modifier = Modifier.padding(16.dp)) {
-        Column(Modifier.clickable { }.fillMaxWidth()) {
+    Card(elevation = 2.dp, modifier = Modifier.padding(8.dp)) {
+        Column(
+            Modifier
+                .clickable { }
+                .fillMaxWidth()) {
             Row(Modifier.padding(8.dp)) {
                 NetworkImage(
                     url = item.userImageURL,
                     contentDescription = "avatar",
-                    modifier = Modifier.padding(8.dp).size(48.dp).clip(CircleShape).clickable { }
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .clickable { }
                 )
                 Column(modifier = Modifier.padding(6.dp)) {
                     Text(text = item.user)
@@ -179,7 +216,9 @@ fun VideoListItem(item: VideoHit) {
                         Image(
                             painter = painterResource(id = R.drawable.ic_favorite),
                             contentDescription = "likes",
-                            modifier = Modifier.padding(end = 8.dp).size(20.dp)
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(20.dp)
                         )
                         Text(text = item.likes.toString())
                     }
@@ -194,31 +233,18 @@ fun VideoListItem(item: VideoHit) {
                 SimpleExoPlayer.Builder(context).build()
             }
             var source by remember { mutableStateOf<ProgressiveMediaSource?>(null) }
-            // Gateway to legacy Android Views through XML inflation.
-            /*    AndroidView(modifier = Modifier.fillMaxSize(), viewBlock = { context ->
-                    PlayerView(context).apply {
-                        useController = false
-                        layoutParams = ViewGroup.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT
-                        )
-                        setOnClickListener {
-                            source?.let { s -> exoPlayer.prepare(s) }
-                        }
+            AndroidViewBinding(
+                VideoItemBinding::inflate,
+                modifier = Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth()
+                    .heightIn(min = 200.dp)
+                    .clickable {
+                        source?.let { it1 -> exoPlayer.prepare(it1) }
                     }
-                }, update = { view ->
-                    view.apply {
-                        player = exoPlayer
-                        exoPlayer.playWhenReady =true
-                    }
-
-                })*/
-            AndroidViewBinding(VideoItemBinding::inflate, modifier = Modifier.fillMaxSize()) {
+            ) {
                 playerView.player = exoPlayer
                 exoPlayer.playWhenReady = true
-                source?.let { it1 -> exoPlayer.prepare(it1) }
-                playerView.setOnClickListener {
-                }
             }
             LaunchedEffect(uri) {
                 val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(
